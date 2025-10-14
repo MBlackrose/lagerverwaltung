@@ -1,0 +1,16 @@
+# Python / venv
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Lokale DB & Instanz
+database/*.db
+instance/
+
+# Geheimnisse/Env
+.env
+
+# Sonstiges
+*.sqlite3
+.DS_Store

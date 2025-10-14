@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  <h1>Artikel-Liste</h1>
+
+  <p><a href="{{ url_for('items_new') }}">+ Neuer Artikel</a></p>
+
+  <table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>SKU</th>
+        <th>Barcode</th>
+        <th>Bestand</th>
+        <th>Min</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+        {% set low = it.qty < it.min_qty %}
+        <tr class="{{ 'row-low' if low else '' }}">
+          <td>{{ it.name }}</td>
+          <td>{{ it.sku }}</td>
+          <td>{{ it.barcode or '—' }}</td>
+          <td>{{ it.qty }}</td>
+          <td>{{ it.min_qty }}</td>
+          <td>{{ 'LOW' if low else 'OK' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6">Noch keine Artikel erfasst.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
