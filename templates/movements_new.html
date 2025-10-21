@@ -1,0 +1,24 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<h2>Bestandsbewegung buchen</h2>
+<form method="post">
+  <div>
+    <label>Artikel</label>
+    <select name="item_id" required>
+      {% for it in items %}
+        <option value="{{ it.id }}">{{ it.name }} (Bestand: {{ it.qty }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Mengenänderung</label>
+    <input type="number" name="change" placeholder="+5 oder -3" required>
+  </div>
+  <div>
+    <label>Grund (optional)</label>
+    <input type="text" name="reason">
+  </div>
+  <button type="submit">Speichern</button>
+</form>
+{% endblock %}

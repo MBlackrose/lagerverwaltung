@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}Registrierung - IT-Lagerverwaltung{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-sm mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-burgundy">📦</h1>
+      <h2 class="text-3xl font-bold text-white mt-2">Registrierung</h2>
+      <p class="text-gray-400 mt-2">IT-Lagerverwaltung</p>
+    </div>
+
+    <!-- Fehlermeldungen -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="mb-6 p-4 rounded-lg {% if category == 'error' %}bg-red-900 text-red-100 border border-red-700{% else %}bg-green-900 text-green-100 border border-green-700{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Register Form -->
+    <form method="POST" action="{{ url_for('register') }}" class="space-y-6">
+      
+      <!-- Benutzername -->
+      <div>
+        <label class="sr-only" for="username">Benutzername</label>
+        <input 
+          class="w-full px-4 py-3 bg-white border border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy text-base" 
+          id="username" 
+          name="username" 
+          placeholder="Benutzername" 
+          type="text"
+          required
+          minlength="3"
+        />
+        <p class="text-xs text-gray-400 mt-1">Mindestens 3 Zeichen</p>
+      </div>
+
+      <!-- Passwort -->
+      <div>
+        <label class="sr-only" for="password">Passwort</label>
+        <input 
+          class="w-full px-4 py-3 bg-white border border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy text-base" 
+          id="password" 
+          name="password" 
+          placeholder="Passwort" 
+          type="password"
+          required
+          minlength="6"
+        />
+        <p class="text-xs text-gray-400 mt-1">Mindestens 6 Zeichen</p>
+      </div>
+
+      <!-- Passwort wiederholen -->
+      <div>
+        <label class="sr-only" for="password_confirm">Passwort wiederholen</label>
+        <input 
+          class="w-full px-4 py-3 bg-white border border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy text-base" 
+          id="password_confirm" 
+          name="password_confirm" 
+          placeholder="Passwort wiederholen" 
+          type="password"
+          required
+        />
+      </div>
+
+      <!-- Buttons -->
+      <div class="space-y-4">
+        <button 
+          class="w-full bg-burgundy text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/50 hover:bg-burgundy-light transition-all duration-300 shadow-[0_0_20px_theme(colors.burgundy)]" 
+          type="submit"
+        >
+          Registrieren
+        </button>
+        <a 
+          class="block w-full bg-white text-black font-bold py-3 px-4 rounded-lg border border-black text-center hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black transition" 
+          href="{{ url_for('login') }}"
+        >
+          Zurück zum Login
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

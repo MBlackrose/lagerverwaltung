@@ -14,3 +14,239 @@ body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-seri
 .flash-error   { background:#fef2f2; }  /* rötlich */
 
 .row-low { background: mistyrose; }
+
+
+/* ========================================
+   IT-LAGERVERWALTUNG - DARK MODE STYLING
+   ======================================== */
+
+/* Burgund-Farbe als Variable */
+:root {
+    --burgundy: #800020;
+    --burgundy-light: #a01030;
+    --burgundy-dark: #600018;
+}
+
+/* Globale Styles - Dark Mode */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #0f172a;
+    color: #e5e7eb;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Burgund-Klasse */
+.burgundy {
+    color: var(--burgundy);
+}
+
+.bg-burgundy {
+    background-color: var(--burgundy);
+}
+
+.border-burgundy {
+    border-color: var(--burgundy);
+}
+
+/* Links Styling */
+a {
+    color: var(--burgundy);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--burgundy-light);
+    text-decoration: underline;
+}
+
+/* Buttons */
+button, .btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+button[type="submit"] {
+    cursor: pointer;
+}
+
+.bg-burgundy:hover {
+    background-color: var(--burgundy-light);
+}
+
+/* Input Felder - Dark Mode */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+    background-color: #1f2937;
+    color: #e5e7eb;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.2);
+    background-color: #111827;
+}
+
+/* Navigation */
+nav {
+    background: #111827;
+    border-bottom: 1px solid #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+nav a {
+    transition: color 0.2s ease;
+    color: #9ca3af;
+}
+
+nav a:hover {
+    color: var(--burgundy);
+    text-decoration: none;
+}
+
+/* Cards / Kacheln */
+.card {
+    background: #1f2937;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border: 1px solid #374151;
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    border-color: var(--burgundy);
+}
+
+/* Tabellen */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #111827;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 2px solid #374151;
+    color: #d1d5db;
+}
+
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #374151;
+    color: #e5e7eb;
+}
+
+tr:hover {
+    background-color: #1f2937;
+}
+
+/* Flash Messages - Dark Mode */
+.flash-error {
+    background-color: #7f1d1d;
+    border: 1px solid #dc2626;
+    color: #fecaca;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.flash-success {
+    background-color: #15803d;
+    border: 1px solid #22c55e;
+    color: #bbf7d0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Badge / Label */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-red {
+    background-color: #7f1d1d;
+    color: #fecaca;
+}
+
+.badge-green {
+    background-color: #15803d;
+    color: #bbf7d0;
+}
+
+.badge-blue {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+}
+
+/* Low Stock Animation */
+@keyframes pulse-warning {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.low-stock {
+    animation: pulse-warning 2s infinite;
+}
+
+/* Footer */
+footer {
+    background-color: #0f172a;
+    color: #9ca3af;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    border-top: 1px solid #374151;
+}
+
+/* KPI Cards */
+.kpi-card {
+    background: #1f2937;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    border-left: 4px solid var(--burgundy);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+    
+    table {
+        font-size: 0.75rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+}

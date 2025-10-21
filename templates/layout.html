@@ -1,35 +1,106 @@
-<!doctype html>
-<html lang="de">
+<!DOCTYPE html>
+<html class="dark" lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IT-Lagerverwaltung</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>{% block title %}IT-Lagerverwaltung{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            burgundy: "#800020",
+            "burgundy-light": "#a01030",
+            "background-light": "#f8f6f6",
+            "background-dark": "#211111"
+          },
+          fontFamily: {
+            display: "Spline Sans"
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem",
+            lg: "1rem",
+            xl: "1.5rem",
+            full: "9999px"
+          }
+        }
+      }
+    };
+  </script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: max(884px, 100dvh);
+    }
+  </style>
 </head>
-<body>
-  <nav class="nav">
-    <a href="{{ url_for('index') }}">Start</a>
-    <a href="{{ url_for('items_list') }}">Artikel-Liste</a>
-    <a href="{{ url_for('items_new') }}">Artikel anlegen</a>
-    <a href="#" title="Bald: Ausgabe">Ausgabe</a>
-    <a href="#" title="Bald: Admin">Admin</a>
-  </nav>
+<body class="bg-background-light dark:bg-background-dark font-display text-white">
 
-  <main>
-    <!-- Zentrale Flash-Meldungen -->
-    {% with msgs = get_flashed_messages(with_categories=true) %}
-      {% if msgs %}
-        <div class="flash">
-          {% for cat, msg in msgs %}
-            <div class="flash-item flash-{{ cat }}">{{ msg }}</div>
-          {% endfor %}
+  <!-- Navigation (nur wenn eingeloggt) -->
+  {% if g.user %}
+  <nav class="bg-gray-900 border-b border-burgundy shadow">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <a href="{{ url_for('index') }}" class="text-2xl font-bold text-burgundy">📦 Lager</a>
+        <div class="flex gap-4">
+          <a href="{{ url_for('index') }}" class="text-gray-300 hover:text-burgundy transition">Start</a>
+          <a href="{{ url_for('items_list') }}" class="text-gray-300 hover:text-burgundy transition">Artikel-Liste</a>
+          <a href="{{ url_for('items_new') }}" class="text-gray-300 hover:text-burgundy transition">Artikel anlegen</a>
+          <a href="{{ url_for('movement_new') }}" class="text-gray-300 hover:text-burgundy transition">Ausgabe (IN/OUT)</a>
+          <a href="{{ url_for('movements_list') }}" class="text-gray-300 hover:text-burgundy transition">Historie</a>
         </div>
+      </div>
+      
+      <form class="flex gap-2" action="{{ url_for('items_list') }}" method="get">
+        <input 
+          type="text" 
+          name="q" 
+          placeholder="🔍 Suche Artikel…" 
+          class="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-burgundy"
+        >
+        <button type="submit" class="bg-burgundy text-white px-4 py-2 rounded-lg hover:bg-burgundy-light">
+          Suchen
+        </button>
+      </form>
+
+      <div class="flex items-center gap-4">
+        <span class="text-gray-300">👤 {{ g.user.username }}</span>
+        <a href="{{ url_for('logout') }}" class="bg-burgundy text-white px-4 py-2 rounded hover:bg-burgundy-light">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- Hauptinhalt -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Flash-Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-900 text-red-100 border border-red-700{% else %}bg-green-900 text-green-100 border border-green-700{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
       {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
   </main>
 
-  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 text-center py-6 mt-12 border-t border-gray-800">
+    <p>&copy; 2025 IT-Lagerverwaltung Landratsamt Lörrach</p>
+  </footer>
+
 </body>
 </html>

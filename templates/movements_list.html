@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Letzte Bewegungen</h2>
+<table>
+  <tr><th>Datum</th><th>Artikel</th><th>Änderung</th><th>Grund</th></tr>
+  {% for m in moves %}
+  <tr>
+    <td>{{ m.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+    <td>{{ m.item.name }}</td>
+    <td>{{ m.change }}</td>
+    <td>{{ m.reason or "-" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

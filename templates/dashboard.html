@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - IT-Lagerverwaltung{% endblock %}
+
+{% block content %}
+<div class="p-8">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <h2 class="text-3xl font-bold mb-2">Überblick</h2>
+      <p class="text-gray-400">Montag, 21. Oktober 2025 | 14:32 Uhr</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- Artikel Gesamt -->
+      <div class="bg-gray-800 rounded-lg p-6 border-l-4 border-burgundy">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-gray-400 text-sm font-medium">Artikel Gesamt</p>
+            <p class="text-3xl font-bold text-white mt-2">{{ total_items }}</p>
+            <p class="text-xs text-green-400 mt-1">↑ 15 diese Woche</p>
+          </div>
+          <span class="text-3xl">📦</span>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert -->
+      <div class="bg-gray-800 rounded-lg p-6 border-l-4 border-red-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-gray-400 text-sm font-medium">Niedrige Bestände</p>
+            <p class="text-3xl font-bold text-red-400 mt-2">{{ low_stock_count }}</p>
+            <p class="text-xs text-red-300 mt-1">Erfordert Aktion</p>
+          </div>
+          <span class="text-3xl">⚠️</span>
+        </div>
+      </div>
+
+      <!-- Bewegungen Heute -->
+      <div class="bg-gray-800 rounded-lg p-6 border-l-4 border-blue-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-gray-400 text-sm font-medium">Bewegungen Heute</p>
+            <p class="text-3xl font-bold text-blue-400 mt-2">47</p>
+            <p class="text-xs text-blue-300 mt-1">Ein- und Ausgänge</p>
+          </div>
+          <span class="text-3xl">🔄</span>
+        </div>
+      </div>
+
+      <!-- Lagerauslastung -->
+      <div class="bg-gray-800 rounded-lg p-6 border-l-4 border-green-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-gray-400 text-sm font-medium">Auslastung</p>
+            <p class="text-3xl font-bold text-green-400 mt-2">76%</p>
+            <p class="text-xs text-green-300 mt-1">Raum verfügbar</p>
+          </div>
+          <span class="text-3xl">📊</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Action Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      
+      <!-- Barcode Scanner (Hauptfeature) -->
+      <div class="lg:col-span-2">
+        <button class="w-full bg-gradient-to-r from-burgundy to-red-700 hover:opacity-90 transition-all p-12 rounded-lg shadow-lg">
+          <p class="text-4xl mb-2">📱</p>
+          <p class="text-2xl font-bold">Barcode-Scanner</p>
+          <p class="text-sm text-red-100 mt-2">Artikel scannen oder manuell eingeben</p>
+        </button>
+      </div>
+
+      <!-- Schnellzugriff -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h3 class="font-bold mb-4">Schnellzugriff</h3>
+        <div class="space-y-2">
+          <a href="{{ url_for('items_new') }}" class="block bg-gray-700 hover:bg-gray-600 p-3 rounded text-center text-sm transition">➕ Artikel hinzufügen</a>
+          <a href="{{ url_for('items_list') }}" class="block bg-gray-700 hover:bg-gray-600 p-3 rounded text-center text-sm transition">📋 Alle Artikel</a>
+          <a href="{{ url_for('movements_list') }}" class="block bg-gray-700 hover:bg-gray-600 p-3 rounded text-center text-sm transition">📊 Bewegungen</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zwei Spalten: Aktivitäten & Niedrige Bestände -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Zuletzt hinzugefügte Artikel -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h3 class="text-lg font-bold mb-4">Zuletzt hinzugefügt</h3>
+        {% if recently_added %}
+          <div class="space-y-3">
+            {% for item in recently_added %}
+            <div class="flex justify-between items-start text-sm pb-3 border-b border-gray-700">
+              <div>
+                <p class="font-medium">{{ item.name }}</p>
+                <p class="text-gray-400 text-xs">SKU: {{ item.sku }}</p>
+              </div>
+              <p class="bg-blue-900 text-blue-100 px-2 py-1 rounded text-xs">{{ item.qty }}x</p>
+            </div>
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('items_list') }}" class="text-burgundy hover:text-red-400 text-sm block pt-2">Alle Artikel →</a>
+        {% else %}
+          <p class="text-gray-400">Noch keine Artikel</p>
+        {% endif %}
+      </div>
+
+      <!-- Niedrige Bestände (Top 5) -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h3 class="text-lg font-bold mb-4">Niedrige Bestände</h3>
+        {% if low_stock %}
+          <div class="space-y-3">
+            {% for item in low_stock %}
+            <div class="flex justify-between items-center text-sm pb-3 border-b border-gray-700">
+              <p class="font-medium">{{ item.name }}</p>
+              <div class="text-right">
+                <p class="font-bold text-red-400">{{ item.qty }}/{{ item.min_qty }}</p>
+                <p class="text-xs text-gray-400">Fehlmenge: {{ item.min_qty - item.qty }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('items_list') }}" class="text-burgundy hover:text-red-400 text-sm block pt-2">Alle anschauen →</a>
+        {% else %}
+          <p class="text-gray-400">Alle Bestände sind OK</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
