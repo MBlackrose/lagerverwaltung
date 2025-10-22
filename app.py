@@ -284,6 +284,72 @@ def dashboard():
     )
 
 
+# ---- SCANNER ROUTE ----
+@app.route('/scanner', methods=['GET', 'POST'])
+@login_required
+def scanner():
+    if request.method == 'GET':
+        return render_template('scanner.html')
+    
+    # POST Request (AJAX von JavaScript)
+    data = request.get_json()
+    barcode = (data.get('barcode') or '').strip()
+    action = data.get('action')  # 'IN' oder 'OUT'
+    quantity = int(data.get('quantity', 1))
+    reason = data.get('reason', '')
+
+    # Validierung
+    if not barcode:
+        return {'success': False, 'message': 'Barcode ist leer'}, 400
+    
+    if quantity <= 0:
+        return {'success': False, 'message': 'Menge muss größer als 0 sein'}, 400
+
+    # Artikel suchen (zuerst nach Barcode, dann nach SKU)
+    item = Item.query.filter(
+        (Item.barcode == barcode) |
+        (Item.sku == barcode)
+    ).first()
+
+    if not item:
+        return {'success': False, 'message': f'❌ Artikel mit Barcode "{barcode}" nicht gefunden'}, 404
+
+    # Bestandsänderung berechnen
+    change = quantity if action == 'IN' else -quantity
+
+    # Kontrolle: Bestand darf nicht negativ werden
+    if item.qty + change < 0:
+        return {
+            'success': False,
+            'message': f'❌ Nicht genug Bestand! Verfügbar: {item.qty}, Angefordert: {quantity}'
+        }, 400
+
+    # Bewegung erstellen und speichern
+    try:
+        movement = Movement(
+            item_id=item.id,
+            change=change,
+            reason=reason or f'Scanner: {action}'
+        )
+        item.qty = item.qty + change
+        db.session.add(movement)
+        db.session.commit()
+
+        action_text = '📥 eingegangen' if action == 'IN' else '📤 entnommen'
+        message = f'✅ {quantity}x {item.name} {action_text}. Neuer Bestand: {item.qty}'
+
+        return {
+            'success': True,
+            'message': message,
+            'item_name': item.name,
+            'new_qty': item.qty
+        }, 200
+
+    except Exception as e:
+        db.session.rollback()
+        return {'success': False, 'message': f'❌ Fehler beim Speichern: {str(e)}'}, 500
+
+
 # -------- START --------
 if __name__ == '__main__':
     with app.app_context():

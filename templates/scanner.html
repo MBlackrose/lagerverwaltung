@@ -1,0 +1,210 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 text-white pt-20">
+    <div class="max-w-2xl mx-auto px-4">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-burgundy mb-2">📱 Barcode-Scanner</h1>
+            <p class="text-gray-400">Artikel scannen oder manuell eingeben</p>
+        </div>
+
+        <!-- Scanner Form -->
+        <div class="bg-gray-800 rounded-lg border border-burgundy/30 p-8 mb-8">
+            
+            <form id="scannerForm" method="POST" action="/scanner" class="space-y-6">
+                
+                <!-- Barcode Input -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-burgundy">
+                        🔍 Barcode / SKU eingeben:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="barcodeInput" 
+                        name="barcode"
+                        placeholder="Z.B. 789456123 oder SKU-001"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-burgundy focus:outline-none"
+                        autofocus
+                        required
+                    >
+                    <p class="text-xs text-gray-500 mt-2">💡 Tipp: Scanner konzentriert sich automatisch auf dieses Feld</p>
+                </div>
+
+                <!-- Action (IN/OUT) -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-burgundy">
+                        📤 Was passiert mit dem Artikel?
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center p-4 bg-gray-700 rounded-lg border border-gray-600 cursor-pointer hover:border-burgundy transition">
+                            <input type="radio" name="action" value="IN" required class="mr-3">
+                            <span class="text-lg">📥 Eingegangen</span>
+                        </label>
+                        <label class="flex items-center p-4 bg-gray-700 rounded-lg border border-gray-600 cursor-pointer hover:border-burgundy transition">
+                            <input type="radio" name="action" value="OUT" required class="mr-3">
+                            <span class="text-lg">📤 Entnommen</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Menge -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-burgundy">
+                        📦 Menge (Anzahl):
+                    </label>
+                    <input 
+                        type="number" 
+                        name="quantity"
+                        value="1"
+                        min="1"
+                        max="999"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-burgundy focus:outline-none"
+                        required
+                    >
+                </div>
+
+                <!-- Grund (optional) -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-burgundy">
+                        💬 Grund (optional):
+                    </label>
+                    <textarea 
+                        name="reason"
+                        placeholder="Z.B. 'Eingang von Lieferant XYZ' oder 'Ausgegeben an IT-Support'"
+                        rows="3"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-burgundy focus:outline-none"
+                    ></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit"
+                    class="w-full bg-burgundy hover:bg-burgundy-light text-white font-bold py-3 px-6 rounded-lg transition duration-200 text-lg"
+                >
+                    ✅ Bestand aktualisieren
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Letzte Scans (History) -->
+        <div class="bg-gray-800 rounded-lg border border-burgundy/30 p-6">
+            <h2 class="text-2xl font-bold text-burgundy mb-4">📋 Letzte Scans (Diese Session)</h2>
+            
+            <div id="scanHistory" class="space-y-3">
+                <p class="text-gray-500 italic">Noch keine Scans durchgeführt...</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- JavaScript für Scanner-Logik -->
+<script>
+    // Lokale Historie (wird gelöscht wenn Seite neu geladen wird)
+    let scanHistory = [];
+
+    // Focus auf Input-Feld setzen
+    document.getElementById('barcodeInput').focus();
+
+    // Form Submit Handler
+    document.getElementById('scannerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const barcode = document.getElementById('barcodeInput').value;
+        const action = document.querySelector('input[name="action"]:checked').value;
+        const quantity = document.querySelector('input[name="quantity"]').value;
+        const reason = document.querySelector('textarea[name="reason"]').value;
+
+        // Validierung
+        if (!barcode.trim()) {
+            alert('❌ Bitte geben Sie einen Barcode ein!');
+            return;
+        }
+
+        // An Backend senden
+        try {
+            const response = await fetch('/scanner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    barcode: barcode,
+                    action: action,
+                    quantity: parseInt(quantity),
+                    reason: reason
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Erfolgsmeldung
+                showSuccess(data.message, barcode, action, quantity);
+                
+                // Zu Historie hinzufügen
+                addToHistory(barcode, action, quantity, data.item_name);
+
+                // Form zurücksetzen
+                document.getElementById('barcodeInput').value = '';
+                document.querySelector('input[name="quantity"]').value = '1';
+                document.querySelector('textarea[name="reason"]').value = '';
+                document.querySelector('input[name="action"][value="IN"]').checked = true;
+                
+                // Focus zurück auf Input
+                document.getElementById('barcodeInput').focus();
+            } else {
+                alert('❌ Fehler: ' + data.message);
+            }
+        } catch (error) {
+            alert('❌ Netzwerkfehler: ' + error.message);
+        }
+    });
+
+    // Erfolgsmeldung anzeigen
+    function showSuccess(message, barcode, action, quantity) {
+        const actionText = action === 'IN' ? '📥 Eingegangen' : '📤 Entnommen';
+        alert(`✅ Erfolg!\n\n${actionText}\n${quantity}x Barcode: ${barcode}\n\n${message}`);
+    }
+
+    // Zur Historie hinzufügen
+    function addToHistory(barcode, action, quantity, itemName) {
+        const now = new Date().toLocaleTimeString('de-DE');
+        const actionText = action === 'IN' ? '📥' : '📤';
+        
+        scanHistory.unshift({
+            time: now,
+            barcode: barcode,
+            action: actionText,
+            quantity: quantity,
+            itemName: itemName || 'Unbekannt'
+        });
+
+        updateHistoryDisplay();
+    }
+
+    // Historie anzeigen
+    function updateHistoryDisplay() {
+        const historyDiv = document.getElementById('scanHistory');
+        
+        if (scanHistory.length === 0) {
+            historyDiv.innerHTML = '<p class="text-gray-500 italic">Noch keine Scans durchgeführt...</p>';
+            return;
+        }
+
+        historyDiv.innerHTML = scanHistory.map(item => `
+            <div class="bg-gray-700 rounded p-3 flex justify-between items-center">
+                <div>
+                    <p class="font-semibold">${item.action} ${item.itemName}</p>
+                    <p class="text-sm text-gray-400">Barcode: ${item.barcode} | Menge: ${item.quantity}x</p>
+                </div>
+                <p class="text-xs text-burgundy">${item.time}</p>
+            </div>
+        `).join('');
+    }
+</script>
+
+{% endblock %}
