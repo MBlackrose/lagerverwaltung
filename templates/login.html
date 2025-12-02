@@ -1,82 +1,106 @@
-{% extends "layout.html" %}
-
-{% block title %}Anmeldung - IT-Lagerverwaltung{% endblock %}
-
-{% block content %}
-<div class="flex flex-col items-center justify-center min-h-screen p-4">
-  <div class="w-full max-w-sm mx-auto">
-    
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldung - IT-Lagerverwaltung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
     <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-burgundy">📦</h1>
-      <h2 class="text-3xl font-bold text-white mt-2">Anmeldung</h2>
-      <p class="text-gray-400 mt-2">IT-Lagerverwaltung</p>
-    </div>
-
-    <!-- Fehlermeldungen -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="mb-6 p-4 rounded-lg {% if category == 'error' %}bg-red-900 text-red-100 border border-red-700{% else %}bg-green-900 text-green-100 border border-green-700{% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- Login Form -->
-    <form method="POST" action="{{ url_for('login') }}" class="space-y-6">
-      
-      <!-- Benutzername -->
-      <div>
-        <label class="sr-only" for="username">Benutzername</label>
-        <input 
-          class="w-full px-4 py-3 bg-white border border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy text-base" 
-          id="username" 
-          name="username" 
-          placeholder="Benutzername" 
-          type="text"
-          required
-        />
-      </div>
-
-      <!-- Passwort -->
-      <div>
-        <label class="sr-only" for="password">Passwort</label>
-        <input 
-          class="w-full px-4 py-3 bg-white border border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-burgundy text-base" 
-          id="password" 
-          name="password" 
-          placeholder="Passwort" 
-          type="password"
-          required
-        />
-      </div>
-
-      <!-- Buttons -->
-      <div class="space-y-4">
-        <button 
-          class="w-full bg-burgundy text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/50 hover:bg-burgundy-light transition-all duration-300 shadow-[0_0_20px_theme(colors.burgundy)]" 
-          type="submit"
-        >
-          Anmelden
-        </button>
-        <a 
-          class="block w-full bg-white text-black font-bold py-3 px-4 rounded-lg border border-black text-center hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black transition" 
-          href="{{ url_for('register') }}"
-        >
-          Hier registrieren
+    <header class="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
+        <!-- Logo Platzhalter -->
+        <div class="flex items-center">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="h-16">
+        </div>   
+        
+        <!-- Login Button (top right) -->
+        <a href="#" class="bg-[#8B1538] hover:bg-[#6B1028] text-white px-6 py-2.5 rounded transition duration-200 font-medium">
+            Login
         </a>
-      </div>
-    </form>
+    </header>
 
-    <!-- Test Login Info -->
-    <div class="mt-8 p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 text-sm">
-      <strong class="text-gray-100">Test-Login:</strong><br>
-      Benutzername: <code class="bg-gray-900 px-2 py-1 rounded">admin</code><br>
-      Passwort: <code class="bg-gray-900 px-2 py-1 rounded">admin123</code>
-    </div>
+    <!-- Main Content -->
+    <main class="flex items-center justify-center min-h-[calc(100vh-80px)] px-4">
+        <div class="w-full max-w-md">
+            <!-- Beispiel Erfolgsmeldung (auskommentiert) -->
+            <!-- 
+            <div class="mb-6 p-4 rounded bg-green-50 text-green-700 border border-green-200">
+                Erfolgreich registriert! Bitte melden Sie sich an.
+            </div>
+            -->
 
-  </div>
-</div>
-{% endblock %}
+            <!-- Anmeldung Form -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-normal text-gray-800">Anmeldung</h1>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                <!-- Email/Username Field -->
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Email-Adresse</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            placeholder="@loerrach-landkreis.de"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Passwort</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                </div>
+
+                <!-- Login Button (Orange) -->
+                <button 
+                    type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded transition duration-200"
+                >
+                    Login
+                </button>
+            </form>
+
+            <!-- Registration Link -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-600 mb-2">Kein Zugang?</p>
+                <p class="text-gray-800">
+                    Hier kannst du dich 
+                    <a href="#" class="text-[#8B1538] hover:text-[#6B1028] font-semibold underline">REGISTRIEREN</a>.
+                </p>
+            </div>
+
+            <!-- Test Login Info (kann später entfernt werden) -->
+            <div class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded text-gray-600 text-sm">
+                <strong class="text-gray-800">Test-Login:</strong><br>
+                Benutzername: <code class="bg-gray-200 px-2 py-1 rounded text-gray-800">admin</code><br>
+                Passwort: <code class="bg-gray-200 px-2 py-1 rounded text-gray-800">admin123</code>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white text-gray-600 text-center py-6 border-t border-gray-200">
+        <p>&copy; 2025 IT-Lagerverwaltung Landratsamt Lörrach</p>
+    </footer>
+</body>
+</html>

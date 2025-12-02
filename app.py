@@ -282,47 +282,64 @@ def dashboard():
         recently_added=recently_added,
         low_stock=low_stock
     )
-
-
-# ---- SCANNER ROUTE ----
+#Scanner Route#
 @app.route('/scanner', methods=['GET', 'POST'])
 @login_required
 def scanner():
     if request.method == 'GET':
-        return render_template('scanner.html')
+        # letzte Bewegungen für Anzeige
+        last_moves = Movement.query.order_by(Movement.created_at.desc()).limit(10).all()
+        return render_template('scanner.html', last_moves=last_moves)
     
-    # POST Request (AJAX von JavaScript)
-    data = request.get_json()
+    # POST: Daten können als JSON (AJAX) oder als normales Formular kommen
+    if request.is_json:
+        data = request.get_json() or {}
+    else:
+        data = request.form or {}
+
     barcode = (data.get('barcode') or '').strip()
-    action = data.get('action')  # 'IN' oder 'OUT'
-    quantity = int(data.get('quantity', 1))
-    reason = data.get('reason', '')
+    action = (data.get('action') or 'IN').upper()  # 'IN' oder 'OUT'
+    quantity = int(data.get('quantity') or 1)
+    reason = data.get('reason') or ''
 
     # Validierung
     if not barcode:
-        return {'success': False, 'message': 'Barcode ist leer'}, 400
+        msg = 'Barcode ist leer'
+        if request.is_json:
+            return {'success': False, 'message': msg}, 400
+        flash(msg, 'error')
+        return redirect(url_for('scanner'))
     
     if quantity <= 0:
-        return {'success': False, 'message': 'Menge muss größer als 0 sein'}, 400
+        msg = 'Menge muss größer als 0 sein'
+        if request.is_json:
+            return {'success': False, 'message': msg}, 400
+        flash(msg, 'error')
+        return redirect(url_for('scanner'))
 
-    # Artikel suchen (zuerst nach Barcode, dann nach SKU)
+    # Artikel suchen (Barcode ODER SKU)
     item = Item.query.filter(
         (Item.barcode == barcode) |
         (Item.sku == barcode)
     ).first()
 
     if not item:
-        return {'success': False, 'message': f'❌ Artikel mit Barcode "{barcode}" nicht gefunden'}, 404
+        msg = f'❌ Artikel mit Barcode/SKU "{barcode}" nicht gefunden'
+        if request.is_json:
+            return {'success': False, 'message': msg}, 404
+        flash(msg, 'error')
+        return redirect(url_for('scanner'))
 
     # Bestandsänderung berechnen
     change = quantity if action == 'IN' else -quantity
 
     # Kontrolle: Bestand darf nicht negativ werden
     if item.qty + change < 0:
-        return {
-            'success': False,
-            'message': f'❌ Nicht genug Bestand! Verfügbar: {item.qty}, Angefordert: {quantity}'
-        }, 400
+        msg = f'❌ Nicht genug Bestand! Verfügbar: {item.qty}, Angefordert: {quantity}'
+        if request.is_json:
+            return {'success': False, 'message': msg}, 400
+        flash(msg, 'error')
+        return redirect(url_for('scanner'))
 
     # Bewegung erstellen und speichern
     try:
@@ -338,16 +355,25 @@ def scanner():
         action_text = '📥 eingegangen' if action == 'IN' else '📤 entnommen'
         message = f'✅ {quantity}x {item.name} {action_text}. Neuer Bestand: {item.qty}'
 
-        return {
-            'success': True,
-            'message': message,
-            'item_name': item.name,
-            'new_qty': item.qty
-        }, 200
+        if request.is_json:
+            return {
+                'success': True,
+                'message': message,
+                'item_name': item.name,
+                'new_qty': item.qty
+            }, 200
+
+        flash(message, 'success')
+        return redirect(url_for('scanner'))
 
     except Exception as e:
         db.session.rollback()
-        return {'success': False, 'message': f'❌ Fehler beim Speichern: {str(e)}'}, 500
+        msg = f'❌ Fehler beim Speichern: {str(e)}'
+        if request.is_json:
+            return {'success': False, 'message': msg}, 500
+        flash(msg, 'error')
+        return redirect(url_for('scanner'))
+   
 
 
 # -------- START --------
