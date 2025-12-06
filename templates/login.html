@@ -21,11 +21,6 @@
         <div class="flex items-center">
           <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="h-16">
         </div>   
-        
-        <!-- Login Button (top right) -->
-        <a href="#" class="bg-[#8B1538] hover:bg-[#6B1028] text-white px-6 py-2.5 rounded transition duration-200 font-medium">
-            Login
-        </a>
     </header>
 
     <!-- Main Content -->
@@ -85,17 +80,13 @@
                 <p class="text-gray-600 mb-2">Kein Zugang?</p>
                 <p class="text-gray-800">
                     Hier kannst du dich 
-                    <a href="#" class="text-[#8B1538] hover:text-[#6B1028] font-semibold underline">REGISTRIEREN</a>.
+                        <a href="{{ url_for('register') }}" class="text-[#98032D] hover:opacity-80 font-semibold underline">
+                    REGISTRIEREN
+                 </a>.
                 </p>
             </div>
 
-            <!-- Test Login Info (kann später entfernt werden) -->
-            <div class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded text-gray-600 text-sm">
-                <strong class="text-gray-800">Test-Login:</strong><br>
-                Benutzername: <code class="bg-gray-200 px-2 py-1 rounded text-gray-800">admin</code><br>
-                Passwort: <code class="bg-gray-200 px-2 py-1 rounded text-gray-800">admin123</code>
-            </div>
-        </div>
+            
     </main>
 
     <!-- Footer -->

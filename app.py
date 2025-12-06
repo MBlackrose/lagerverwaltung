@@ -33,6 +33,31 @@ class Movement(db.Model):
     change = db.Column(db.Integer, nullable=False)
     reason = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # ===== EMPFÄNGER-DATEN =====
+    recipient_firstname = db.Column(db.String(100))
+    recipient_lastname = db.Column(db.String(100))
+    recipient_department = db.Column(db.String(100))
+    recipient_email = db.Column(db.String(120))
+    
+    # ===== IT-MITARBEITER (der ausgibt) =====
+    issuer_firstname = db.Column(db.String(100))
+    issuer_lastname = db.Column(db.String(100))
+    
+    # ===== GERÄTE-DETAILS =====
+    inventory_number = db.Column(db.String(50))
+    serial_number = db.Column(db.String(50))
+    
+    # ===== ZUSATZINFO =====
+    has_keyboard = db.Column(db.Boolean, default=False)
+    has_damage = db.Column(db.Boolean, default=False)
+    damage_description = db.Column(db.Text)
+    
+    # ===== SIGNATUR & PDF =====
+    signature = db.Column(db.Text)
+    pdf_file = db.Column(db.String(200))
+    
+    # Beziehung zu Item
     item = db.relationship('Item', backref=db.backref('movements', lazy=True))
 
 class User(db.Model):
