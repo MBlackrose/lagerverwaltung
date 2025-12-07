@@ -1,5 +1,5 @@
 # IT-Lagerverwaltung – Starter
-Einfaches Flask-Grundgerüst für dein IHK-Projekt.
+Einfaches Flask-Grundgerüst für dein Projekt.
 
 ## Schnellstart (Windows, PowerShell)
 1) Python 3.11+ installieren (falls noch nicht vorhanden).
