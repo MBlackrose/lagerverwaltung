@@ -3,127 +3,124 @@
 {% block title %}Barcode-Scanner - IT-Lagerverwaltung{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-8">
+<div class="max-w-4xl mx-auto px-4 py-8">
     
     <!-- Header -->
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-[#98032D] mb-2">📱 Barcode-Scanner</h1>
-        <p class="text-gray-600">Artikel scannen oder manuell eingeben</p>
+        <h1 class="text-3xl font-bold text-[#98032D] mb-2">Barcode-Scanner</h1>
+        <p class="text-gray-600">Artikel scannen und zum Warenkorb hinzufügen</p>
     </div>
 
-    <!-- Scanner Form -->
-    <div class="bg-white border border-gray-300 shadow-md p-8 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <form id="scannerForm" method="POST" action="{{ url_for('scanner') }}" class="space-y-6">
+        <!-- LINKE SEITE: Scanner -->
+        <div class="bg-white border border-gray-300 shadow-md p-6">
+            <h2 class="text-xl font-bold text-[#98032D] mb-4">Artikel scannen</h2>
             
-            <!-- Barcode Input -->
-            <div>
-                <label class="block text-sm font-semibold mb-2 text-[#98032D]">
-                    🔍 Barcode / SKU eingeben:
-                </label>
-                <input 
-                    type="text" 
-                    id="barcodeInput" 
-                    name="barcode"
-                    placeholder="Z.B. 789456123 oder SKU-001"
-                    class="w-full px-4 py-3 bg-white text-gray-900 border border-gray-400 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
-                    autofocus
-                    required
-                >
-                <p class="text-xs text-gray-700 mt-2">💡 Tipp: Scanner konzentriert sich automatisch auf dieses Feld</p>
-            </div>
-
-            <!-- Action (IN/OUT) -->
-            <div>
-                <label class="block text-sm font-semibold mb-2 text-[#98032D]">
-                    📤 Was passiert mit dem Artikel?
-                </label>
-                <div class="grid grid-cols-2 gap-4">
-                    <label class="flex items-center p-4 bg-white border border-gray-400 cursor-pointer hover:border-[#98032D] transition">
-                        <input type="radio" name="action" value="IN" required class="mr-3">
-                        <span class="text-lg text-gray-900">📥 Eingegangen</span>
-                    </label>
-                    <label class="flex items-center p-4 bg-white border border-gray-400 cursor-pointer hover:border-[#98032D] transition">
-                        <input type="radio" name="action" value="OUT" required class="mr-3">
-                        <span class="text-lg text-gray-900">📤 Entnommen</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Menge -->
-            <div>
-                <label class="block text-sm font-semibold mb-2 text-[#98032D]">
-                    📦 Menge (Anzahl):
-                </label>
-                <input 
-                    type="number" 
-                    name="quantity"
-                    value="1"
-                    min="1"
-                    max="999"
-                    class="w-full px-4 py-3 bg-white text-gray-900 border border-gray-400 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
-                    required
-                >
-            </div>
-
-            <!-- Grund (optional) -->
-            <div>
-                <label class="block text-sm font-semibold mb-2 text-[#98032D]">
-                    💬 Grund (optional):
-                </label>
-                <textarea 
-                    name="reason"
-                    placeholder="Z.B. 'Eingang von Lieferant XYZ' oder 'Ausgegeben an IT-Support'"
-                    rows="3"
-                    class="w-full px-4 py-3 bg-white text-gray-900 border border-gray-400 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
-                ></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <button 
-                type="submit"
-                class="w-full bg-[#F18B00] hover:opacity-90 text-white font-bold py-3 px-6 transition duration-200 text-lg"
-            >
-                ✅ Bestand aktualisieren
-            </button>
-
-        </form>
-    </div>
-
-    <!-- Letzte Scans -->
-    <div class="bg-white border border-gray-300 shadow-md p-6 mb-8">
-        <h2 class="text-2xl font-bold text-[#98032D] mb-4">📋 Letzte Scans</h2>
-        
-        {% if recent_movements %}
-          <div class="space-y-3">
-            {% for move in recent_movements %}
-              {% set action_icon = '📥' if move.change > 0 else '📤' %}
-              <div class="bg-gray-50 border border-gray-300 p-3 flex justify-between items-center hover:bg-gray-100 transition">
+            <form method="POST" action="{{ url_for('scanner') }}" class="space-y-4">
+                
+                <!-- Barcode Input -->
                 <div>
-                  <p class="font-semibold text-gray-900">
-                    {{ action_icon }} {{ move.item.name }}
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    Barcode: {{ move.item.barcode or '–' }} |
-                    Menge: {{ move.change|abs }}x |
-                    Grund: {{ move.reason or '–' }}
-                  </p>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">
+                        Barcode / SKU eingeben:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="barcodeInput" 
+                        name="barcode"
+                        placeholder="Scannen oder eingeben..."
+                        class="w-full px-4 py-3 border border-gray-400 focus:border-[#98032D] focus:outline-none"
+                        autofocus
+                        required
+                    >
                 </div>
-                <p class="text-xs text-[#98032D]">
-                  {{ move.created_at.strftime("%d.%m.%Y %H:%M") }}
-                </p>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-gray-600 text-center py-4">Noch keine Scans vorhanden</p>
-        {% endif %}
+
+                <!-- Menge -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">
+                        Menge:
+                    </label>
+                    <input 
+                        type="number" 
+                        name="quantity"
+                        value="1"
+                        min="1"
+                        class="w-full px-4 py-3 border border-gray-400 focus:border-[#98032D] focus:outline-none"
+                        required
+                    >
+                </div>
+
+                <!-- Button -->
+                <button 
+                    type="submit"
+                    class="w-full bg-[#98032D] hover:opacity-90 text-white font-bold py-3 px-6"
+                >
+                    Zum Warenkorb hinzufügen
+                </button>
+
+            </form>
+        </div>
+
+        <!-- RECHTE SEITE: Warenkorb -->
+        <div class="bg-white border border-gray-300 shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-[#98032D]">
+                    Warenkorb ({{ cart_items|length }} Artikel)
+                </h2>
+            </div>
+            
+            {% if cart_items %}
+                <div class="space-y-3 mb-6">
+                    {% for cart_item in cart_items %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 border border-gray-200">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ cart_item.item.name }}</p>
+                            <p class="text-sm text-gray-600">
+                                SKU: {{ cart_item.item.sku }} | Menge: {{ cart_item.quantity }}x
+                            </p>
+                        </div>
+                        <a href="{{ url_for('cart_remove', item_id=cart_item.item.id) }}" 
+                           class="text-red-600 hover:text-red-800 text-sm">
+                            Entfernen
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- 3 OPTIONEN -->
+                <div class="space-y-3">
+                    
+                    <!-- AUSGABE Button -->
+                    <a href="{{ url_for('checkout', action='ausgabe') }}" 
+                       class="block w-full bg-[#F18B00] hover:opacity-90 text-white font-bold py-3 px-6 text-center">
+                        AUSGABE (Ware geht raus)
+                    </a>
+                    
+                    <!-- RÜCKGABE Button -->
+                    <a href="{{ url_for('checkout', action='rueckgabe') }}" 
+                       class="block w-full bg-green-600 hover:opacity-90 text-white font-bold py-3 px-6 text-center">
+                        RÜCKGABE (Ware kommt zurück)
+                    </a>
+                    
+                    <!-- ABBRECHEN Button -->
+                    <a href="{{ url_for('cart_clear') }}" 
+                       class="block w-full bg-gray-500 hover:opacity-90 text-white font-bold py-3 px-6 text-center">
+                        ABBRECHEN (Warenkorb leeren)
+                    </a>
+                    
+                </div>
+
+            {% else %}
+                <p class="text-gray-500 text-center py-8">Warenkorb ist leer</p>
+                <p class="text-sm text-gray-400 text-center">Scannen Sie Artikel um sie hinzuzufügen</p>
+            {% endif %}
+        </div>
+
     </div>
 
 </div>
 
 <script>
-// Fokus direkt ins Barcode-Feld setzen
 document.getElementById('barcodeInput').focus();
 </script>
 {% endblock %}
