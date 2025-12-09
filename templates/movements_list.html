@@ -11,11 +11,6 @@
       <h1 class="text-3xl font-bold text-gray-900">Bewegungs-Historie</h1>
       <p class="text-gray-600 text-sm mt-1">Alle Ein- und Ausgänge im Überblick</p>
     </div>
-    <a href="{{ url_for('movement_new') }}" 
-       class="bg-[#98032D] hover:opacity-90 text-white px-6 py-3 transition font-medium flex items-center gap-2">
-      <span>➕</span>
-      <span>Neue Bewegung</span>
-    </a>
   </div>
 
   <!-- Historie-Tabelle -->
@@ -26,7 +21,9 @@
           <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">Datum / Zeit</th>
           <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">Artikel</th>
           <th class="px-6 py-4 text-center text-sm font-bold text-gray-900">Änderung</th>
-          <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">Grund</th>
+          <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">Typ</th>
+          <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">Empfänger</th>
+          <th class="px-6 py-4 text-left text-sm font-bold text-gray-900">IT-Mitarbeiter</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
@@ -42,29 +39,37 @@
           <td class="px-6 py-4 text-center">
             {% if move.change > 0 %}
             <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 text-sm font-bold border border-green-200">
-              📥 +{{ move.change }}
+              +{{ move.change }}
             </span>
             {% else %}
             <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1 text-sm font-bold border border-red-200">
-              📤 {{ move.change }}
+              {{ move.change }}
             </span>
             {% endif %}
           </td>
           <td class="px-6 py-4 text-sm text-gray-700">
-            {{ move.reason or "—" }}
+            {{ move.ausgabe_typ or move.reason or "—" }}
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700">
+            {% if move.recipient_firstname %}
+              {{ move.recipient_firstname }} {{ move.recipient_lastname }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700">
+            {% if move.issuer_firstname %}
+              {{ move.issuer_firstname }} {{ move.issuer_lastname }}
+            {% else %}
+              —
+            {% endif %}
           </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="4" class="px-6 py-12 text-center">
+          <td colspan="6" class="px-6 py-12 text-center">
             <div class="flex flex-col items-center gap-3">
-              <span class="text-5xl">📋</span>
               <p class="text-gray-600 font-medium">Noch keine Bewegungen erfasst</p>
-              <a href="{{ url_for('movement_new') }}" 
-                 class="bg-[#98032D] hover:opacity-90 text-white px-6 py-2 transition font-medium inline-flex items-center gap-2">
-                <span>➕</span>
-                <span>Erste Bewegung buchen</span>
-              </a>
             </div>
           </td>
         </tr>
@@ -76,9 +81,14 @@
   <!-- Info-Footer -->
   <div class="mt-6 bg-gray-100 border border-gray-300 p-4">
     <div class="flex items-center justify-between text-sm">
-      <div class="flex items-center gap-6">
-        <span class="text-gray-700">
-          <strong>Gesamt:</strong> {{ moves|length }} Bewegungen angezeigt
-        </span>
-        <span class="text-gray-600">
-          Die letzten 100 Einträge werden a
+      <span class="text-gray-700">
+        <strong>Gesamt:</strong> {{ moves|length }} Bewegungen angezeigt
+      </span>
+      <a href="{{ url_for('dashboard') }}" class="text-[#98032D] hover:underline font-medium">
+        ← Zurück zum Dashboard
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
