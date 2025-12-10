@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block title %}Empfangsbestätigung - IT-Lagerverwaltung{% endblock %}
@@ -17,58 +18,44 @@
       
       <div class="space-y-8">
 
-        <!-- BEREICH 1: ARTIKEL & MENGE -->
+        <!-- BEREICH 1: ARTIKEL AUS WARENKORB -->
         <div class="border-b border-gray-300 pb-8">
-          <h2 class="text-lg font-bold text-gray-900 mb-6">Artikel & Menge</h2>
+          <h2 class="text-lg font-bold text-gray-900 mb-6">Artikel aus Warenkorb</h2>
 
-          <div class="grid grid-cols-2 gap-6">
-            <!-- Artikel auswählen -->
-            <div class="col-span-2">
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Artikel*
-              </label>
-              <select 
-                name="item_id" 
-                required
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
-                <option value="">-- Bitte wählen --</option>
-                {% for item in items %}
-                <option value="{{ item.id }}">
-                  {{ item.name }} | SKU: {{ item.sku }} | Bestand: {{ item.qty }}
-                </option>
+          {% if cart_items %}
+          <div class="bg-gray-50 border border-gray-300 p-4">
+            <table class="w-full">
+              <thead>
+                <tr class="text-left text-sm font-bold text-gray-700 border-b border-gray-300">
+                  <th class="pb-2">Artikel</th>
+                  <th class="pb-2">SKU</th>
+                  <th class="pb-2">Menge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for cart_item in cart_items %}
+                <tr class="border-b border-gray-200">
+                  <td class="py-3 font-medium text-gray-900">{{ cart_item.item.name }}</td>
+                  <td class="py-3 text-gray-600">{{ cart_item.item.sku }}</td>
+                  <td class="py-3 text-gray-900 font-bold">{{ cart_item.quantity }}x</td>
+                </tr>
                 {% endfor %}
-              </select>
-            </div>
-
-            <!-- Menge -->
-            <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Menge*
-              </label>
-              <input 
-                type="number" 
-                name="change" 
-                placeholder="z.B. 1"
-                required
-                min="1"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
-            </div>
-
-            <!-- Grund -->
-            <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Grund / Notiz
-              </label>
-              <input 
-                type="text"
-                name="reason"
-                placeholder="z.B. Ausgabe an Mitarbeiter"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
-            </div>
+              </tbody>
+            </table>
           </div>
+          
+          {% if ausgabe_typ %}
+          <div class="mt-4 p-3 bg-[#98032D] bg-opacity-10 border border-[#98032D] text-[#98032D]">
+            <span class="font-bold">Ausgabe-Typ:</span> {{ ausgabe_typ }}
+          </div>
+          {% endif %}
+          
+          {% else %}
+          <div class="bg-yellow-50 border border-yellow-400 p-4 text-yellow-800">
+            <p>Kein Artikel im Warenkorb. Bitte zuerst Artikel scannen.</p>
+            <a href="{{ url_for('scanner') }}" class="underline font-bold">Zum Scanner</a>
+          </div>
+          {% endif %}
         </div>
 
         <!-- BEREICH 2: EMPFÄNGER-DATEN -->
@@ -76,222 +63,117 @@
           <h2 class="text-lg font-bold text-gray-900 mb-6">Empfänger-Daten</h2>
 
           <div class="grid grid-cols-2 gap-6">
-            <!-- Vorname -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Vorname
-              </label>
-              <input 
-                type="text" 
-                name="recipient_firstname"
-                placeholder="Max"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">Vorname*</label>
+              <input type="text" name="recipient_firstname" required placeholder="Max"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
 
-            <!-- Nachname -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Nachname
-              </label>
-              <input 
-                type="text" 
-                name="recipient_lastname"
-                placeholder="Mustermann"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">Nachname*</label>
+              <input type="text" name="recipient_lastname" required placeholder="Mustermann"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
 
-            <!-- Abteilung -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Abteilung
-              </label>
-              <input 
-                type="text" 
-                name="recipient_department"
-                placeholder="z.B. IT-Support"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">Abteilung</label>
+              <input type="text" name="recipient_department" placeholder="z.B. IT-Support"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
 
-            <!-- E-Mail -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                E-Mail
-              </label>
-              <input 
-                type="email" 
-                name="recipient_email"
-                placeholder="max.mustermann@example.de"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">E-Mail</label>
+              <input type="email" name="recipient_email" placeholder="max.mustermann@example.de"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
           </div>
         </div>
 
-        <!-- BEREICH 3: IT-MITARBEITER -->
-        <div class="border-b border-gray-300 pb-8">
-          <h2 class="text-lg font-bold text-gray-900 mb-6">IT-Mitarbeiter (Ausgeber)</h2>
-
-          <div class="grid grid-cols-2 gap-6">
-            <!-- Vorname -->
-            <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Vorname
-              </label>
-              <input 
-                type="text" 
-                name="issuer_firstname"
-                placeholder="Max"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
-            </div>
-
-            <!-- Nachname -->
-            <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Nachname
-              </label>
-              <input 
-                type="text" 
-                name="issuer_lastname"
-                placeholder="Mustermann"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- BEREICH 4: GERÄTE-DETAILS -->
+        <!-- BEREICH 3: GERÄTE-DETAILS -->
         <div class="border-b border-gray-300 pb-8">
           <h2 class="text-lg font-bold text-gray-900 mb-6">Geräte-Details</h2>
 
           <div class="grid grid-cols-2 gap-6">
-            <!-- Inventarnummer -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Inventarnummer
-              </label>
-              <input 
-                type="text" 
-                name="inventory_number"
+              <label class="block text-sm font-bold text-gray-900 mb-2">Inventarnummer</label>
+              <input type="text" name="inventory_number" 
+                value="{% if cart_items %}{{ cart_items[0].item.inventory_number or '' }}{% endif %}"
                 placeholder="z.B. INV-2024-0001"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+                class="w-full px-4 py-3 bg-gray-100 border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
 
-            <!-- Seriennummer -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Seriennummer
-              </label>
-              <input 
-                type="text" 
-                name="serial_number"
+              <label class="block text-sm font-bold text-gray-900 mb-2">Seriennummer</label>
+              <input type="text" name="serial_number" 
+                value="{% if cart_items %}{{ cart_items[0].item.serial_number or '' }}{% endif %}"
                 placeholder="z.B. SN-ABC123XYZ"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+                class="w-full px-4 py-3 bg-gray-100 border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
             </div>
 
-            <!-- Tastatur vorhanden -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Tastatur vorhanden
-              </label>
-              <select 
-                name="has_keyboard"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">Tastatur vorhanden</label>
+              <select name="has_keyboard"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
                 <option value="false">Nein</option>
                 <option value="true">Ja</option>
               </select>
             </div>
 
-            <!-- Mängel vorhanden -->
             <div>
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Mängel vorhanden
-              </label>
-              <select 
-                name="has_damage"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              >
+              <label class="block text-sm font-bold text-gray-900 mb-2">Mängel vorhanden</label>
+              <select name="has_damage"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]">
                 <option value="false">Nein</option>
                 <option value="true">Ja</option>
               </select>
             </div>
 
-            <!-- Mängelbeschreibung -->
             <div class="col-span-2">
-              <label class="block text-sm font-bold text-gray-900 mb-2">
-                Mängelbeschreibung (falls ja)
-              </label>
-              <textarea 
-                name="damage_description"
-                placeholder="z.B. Kratzer am Display oder USB-Anschluss beschädigt"
-                rows="2"
-                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"
-              ></textarea>
+              <label class="block text-sm font-bold text-gray-900 mb-2">Mängelbeschreibung</label>
+              <textarea name="damage_description" rows="2" placeholder="z.B. Kratzer am Display"
+                class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-1 focus:ring-[#98032D]"></textarea>
             </div>
           </div>
         </div>
 
-        <!-- BEREICH 5: UNTERSCHRIFT -->
+        <!-- BEREICH 4: UNTERSCHRIFT -->
         <div class="border-b border-gray-300 pb-8">
-          <h2 class="text-lg font-bold text-gray-900 mb-6">Unterschrift</h2>
+          <h2 class="text-lg font-bold text-gray-900 mb-6">Unterschrift Empfänger</h2>
 
           <div class="bg-gray-50 border border-gray-400 p-4">
-            <p class="text-sm text-gray-700 mb-4">
-              Bitte unterschreiben Sie hier digital:
-            </p>
+            <p class="text-sm text-gray-700 mb-4">Bitte unterschreiben Sie hier digital:</p>
             
-            <!-- Canvas für Signatur -->
-            <canvas 
-              id="signatureCanvas" 
+            <canvas id="signatureCanvas" 
               class="border border-gray-400 bg-white w-full"
-              width="600" 
-              height="150"
-              style="cursor: crosshair; display: block; margin-bottom: 1rem; touch-action: none;"
-            ></canvas>
+              width="600" height="150"
+              style="cursor: crosshair; display: block; margin-bottom: 1rem; touch-action: none;">
+            </canvas>
 
-            <!-- Buttons für Signatur -->
             <div class="flex gap-3">
-              <button 
-                type="button" 
-                id="clearSignature"
-                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 transition duration-200"
-              >
+              <button type="button" id="clearSignature"
+                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4">
                 Löschen
               </button>
-              <button 
-                type="button" 
-                id="undoSignature"
-                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 transition duration-200"
-              >
+              <button type="button" id="undoSignature"
+                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4">
                 Rückgängig
               </button>
             </div>
 
-            <!-- Hidden Input für Signatur -->
             <input type="hidden" name="signature" id="signatureInput">
           </div>
         </div>
 
         <!-- SUBMIT BUTTONS -->
         <div class="flex gap-4 pt-4">
-          <button 
-            type="submit"
-            class="flex-1 bg-[#98032D] hover:opacity-90 text-white font-bold py-4 px-6 transition duration-200"
-          >
+          <button type="submit" {% if not cart_items %}disabled{% endif %}
+            class="flex-1 bg-[#98032D] hover:opacity-90 text-white font-bold py-4 px-6 disabled:opacity-50 disabled:cursor-not-allowed">
             Speichern & PDF generieren
           </button>
           
-          <a 
-            href="{{ url_for('dashboard') }}"
-            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-4 px-6 transition duration-200 flex items-center justify-center"
-          >
-            Abbrechen
+          <a href="{{ url_for('scanner') }}"
+            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-4 px-6 flex items-center justify-center">
+            Zurück zum Scanner
           </a>
         </div>
 
@@ -317,16 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
   let strokes = [];
   let currentStroke = [];
 
-  // Responsive Canvas
-  function resizeCanvas() {
+  function initCanvas() {
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = 150;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  initCanvas();
+  window.addEventListener('resize', initCanvas);
 
-  // Zeichnen starten
   canvas.addEventListener('mousedown', (e) => {
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
@@ -335,39 +217,28 @@ document.addEventListener('DOMContentLoaded', function() {
     currentStroke = [{x: lastX, y: lastY}];
   });
 
-  // Zeichnen
   canvas.addEventListener('mousemove', (e) => {
     if (!isDrawing) return;
-    
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
     currentStroke.push({x: x, y: y});
-
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-
     lastX = x;
     lastY = y;
   });
 
-  // Zeichnen stoppen
   canvas.addEventListener('mouseup', () => {
-    if (isDrawing && currentStroke.length > 0) {
-      strokes.push(currentStroke);
-    }
+    if (isDrawing && currentStroke.length > 0) strokes.push(currentStroke);
     isDrawing = false;
   });
 
-  // Touch-Support
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     const touch = e.touches[0];
@@ -381,65 +252,51 @@ document.addEventListener('DOMContentLoaded', function() {
   canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
     if (!isDrawing) return;
-    
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-
     currentStroke.push({x: x, y: y});
-
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-
     lastX = x;
     lastY = y;
   });
 
   canvas.addEventListener('touchend', () => {
-    if (isDrawing && currentStroke.length > 0) {
-      strokes.push(currentStroke);
-    }
+    if (isDrawing && currentStroke.length > 0) strokes.push(currentStroke);
     isDrawing = false;
   });
 
-  // Löschen
   clearBtn.addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     strokes = [];
-    currentStroke = [];
     signatureInput.value = '';
   });
 
-  // Rückgängig
   undoBtn.addEventListener('click', () => {
     if (strokes.length > 0) {
       strokes.pop();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       strokes.forEach(stroke => {
-        ctx.strokeStyle = '#000';
+        ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
         ctx.beginPath();
         ctx.moveTo(stroke[0].x, stroke[0].y);
-        for (let i = 1; i < stroke.length; i++) {
-          ctx.lineTo(stroke[i].x, stroke[i].y);
-        }
+        for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
         ctx.stroke();
       });
-      signatureInput.value = '';
     }
   });
 
-  // Formular absenden
   form.addEventListener('submit', (e) => {
     signatureInput.value = canvas.toDataURL('image/png');
   });

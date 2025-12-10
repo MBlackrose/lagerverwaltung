@@ -8,7 +8,7 @@ from extensions import db
 from models import Item, User, Movement
 
 # Services
-from services import CartService, ItemService
+from services import CartService, ItemService, PDFService
 
 
 # -------- KATEGORIEN MIT UNTERKATEGORIEN --------
@@ -220,7 +220,9 @@ def items_new():
             qty=int(request.form.get('qty', 0) or 0),
             min_qty=int(request.form.get('min_qty', 0) or 0),
             category=request.form.get('category', 'Sonstige'),
-            subcategory=request.form.get('subcategory', '')
+            subcategory=request.form.get('subcategory', ''),
+            inventory_number=request.form.get('inventory_number', '').strip(),
+            serial_number=request.form.get('serial_number', '').strip()
         )
         
         flash(message, 'success' if success else 'error')
@@ -248,7 +250,9 @@ def items_edit(item_id):
             qty=int(request.form.get('qty', 0) or 0),
             min_qty=int(request.form.get('min_qty', 0) or 0),
             category=request.form.get('category', 'Sonstige'),
-            subcategory=request.form.get('subcategory', '')
+            subcategory=request.form.get('subcategory', ''),
+            inventory_number=request.form.get('inventory_number', '').strip(),
+            serial_number=request.form.get('serial_number', '').strip()
         )
         
         flash(message, 'success' if success else 'error')
@@ -332,7 +336,6 @@ def checkout(action):
         return redirect(url_for('scanner'))
     
     if action == 'rueckgabe':
-        # Bei Rückgabe: Bestand erhöhen
         for cart_item in cart_service.get_raw():
             item = ItemService.get_by_id(cart_item['item_id'])
             if item:
@@ -387,6 +390,11 @@ def movement_new():
         recipient_lastname = request.form.get('recipient_lastname', '').strip()
         recipient_department = request.form.get('recipient_department', '').strip()
         recipient_email = request.form.get('recipient_email', '').strip()
+        inventory_number = request.form.get('inventory_number', '').strip()
+        serial_number = request.form.get('serial_number', '').strip()
+        has_keyboard = request.form.get('has_keyboard') == 'true'
+        has_damage = request.form.get('has_damage') == 'true'
+        damage_description = request.form.get('damage_description', '').strip()
         signature = request.form.get('signature', '')
         
         for cart_item in cart:
@@ -405,6 +413,11 @@ def movement_new():
                     recipient_email=recipient_email,
                     issuer_firstname=g.user.firstname if g.user else '',
                     issuer_lastname=g.user.lastname if g.user else '',
+                    inventory_number=inventory_number,
+                    serial_number=serial_number,
+                    has_keyboard=has_keyboard,
+                    has_damage=has_damage,
+                    damage_description=damage_description,
                     signature=signature
                 )
                 item.qty += change
@@ -412,12 +425,21 @@ def movement_new():
         
         db.session.commit()
         
+        # PDF generieren für die letzte Bewegung
+        if cart and len(cart) > 0:
+            last_item = ItemService.get_by_id(cart[0]['item_id'])
+            last_movement = Movement.query.order_by(Movement.id.desc()).first()
+            if last_movement and last_item:
+                pdf_path = PDFService.create_receipt(last_movement, last_item)
+                last_movement.pdf_file = pdf_path
+                db.session.commit()
+        
         cart_service.clear()
         session['ausgabe_typ'] = ''
         session.modified = True
         
-        flash('Bewegung gespeichert.', 'success')
-        return redirect(url_for('items_list'))
+        flash('Bewegung gespeichert & PDF erstellt!', 'success')
+        return redirect(url_for('movements_list'))
     
     return render_template('movements_new.html', 
                           cart_items=cart_service.get_items(), 

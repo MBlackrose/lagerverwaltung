@@ -83,7 +83,7 @@
           <!-- SKU -->
           <div class="bg-white p-6 border-l-4 border-[#F18B00]">
             <label class="block text-sm font-bold text-gray-900 mb-2">
-              Inventarnummer (SKU)*
+              SKU*
             </label>
             <input 
               type="text"
@@ -103,6 +103,36 @@
               type="text"
               name="barcode"
               placeholder="EAN / QR-Code"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+        </div>
+
+        <!-- Inventarnummer und Seriennummer (NEU) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Inventarnummer -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Inventarnummer
+            </label>
+            <input 
+              type="text"
+              name="inventory_number"
+              placeholder="z.B. INV-2024-0001"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+
+          <!-- Seriennummer -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Seriennummer
+            </label>
+            <input 
+              type="text"
+              name="serial_number"
+              placeholder="z.B. SN-ABC123XYZ"
               class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
             >
           </div>

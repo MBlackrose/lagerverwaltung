@@ -12,16 +12,7 @@ class ItemService:
     
     @staticmethod
     def get_all(category_filter=None, search_query=None):
-        """
-        Gibt alle Artikel zurück, optional gefiltert.
-        
-        Args:
-            category_filter: Kategorie zum Filtern (optional)
-            search_query: Suchbegriff (optional)
-        
-        Returns:
-            list: Liste aller passenden Artikel
-        """
+        """Gibt alle Artikel zurück, optional gefiltert."""
         query = Item.query
         
         if search_query:
@@ -38,49 +29,19 @@ class ItemService:
     
     @staticmethod
     def get_by_id(item_id):
-        """
-        Findet einen Artikel anhand seiner ID.
-        
-        Args:
-            item_id: Die Artikel-ID
-        
-        Returns:
-            Item: Der gefundene Artikel oder None
-        """
+        """Findet einen Artikel anhand seiner ID."""
         return Item.query.get(item_id)
     
     @staticmethod
     def get_by_barcode(barcode):
-        """
-        Findet einen Artikel anhand Barcode oder SKU.
-        
-        Args:
-            barcode: Barcode oder SKU
-        
-        Returns:
-            Item: Der gefundene Artikel oder None
-        """
+        """Findet einen Artikel anhand Barcode oder SKU."""
         return Item.query.filter(
             (Item.barcode == barcode) | (Item.sku == barcode)
         ).first()
     
     @staticmethod
-    def create(name, sku, barcode=None, qty=0, min_qty=0, category='Sonstige', subcategory=''):
-        """
-        Erstellt einen neuen Artikel.
-        
-        Args:
-            name: Artikelname
-            sku: Artikelnummer
-            barcode: Barcode (optional)
-            qty: Anfangsbestand
-            min_qty: Mindestbestand
-            category: Kategorie
-            subcategory: Unterkategorie
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
+    def create(name, sku, barcode=None, qty=0, min_qty=0, category='Sonstige', subcategory='', inventory_number=None, serial_number=None):
+        """Erstellt einen neuen Artikel."""
         if not name or not sku:
             return False, 'Name und Artikelnummer (SKU) sind Pflicht.'
         
@@ -92,7 +53,9 @@ class ItemService:
                 qty=qty,
                 min_qty=min_qty,
                 category=category,
-                subcategory=subcategory
+                subcategory=subcategory,
+                inventory_number=inventory_number or None,
+                serial_number=serial_number or None
             )
             db.session.add(item)
             db.session.commit()
@@ -102,17 +65,8 @@ class ItemService:
             return False, 'SKU oder Barcode ist schon vergeben.'
     
     @staticmethod
-    def update(item_id, name, sku, barcode=None, qty=0, min_qty=0, category='Sonstige', subcategory=''):
-        """
-        Aktualisiert einen bestehenden Artikel.
-        
-        Args:
-            item_id: ID des zu aktualisierenden Artikels
-            ... (alle anderen Felder)
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
+    def update(item_id, name, sku, barcode=None, qty=0, min_qty=0, category='Sonstige', subcategory='', inventory_number=None, serial_number=None):
+        """Aktualisiert einen bestehenden Artikel."""
         item = Item.query.get(item_id)
         if not item:
             return False, 'Artikel nicht gefunden.'
@@ -128,6 +82,8 @@ class ItemService:
             item.min_qty = min_qty
             item.category = category
             item.subcategory = subcategory
+            item.inventory_number = inventory_number or None
+            item.serial_number = serial_number or None
             db.session.commit()
             return True, 'Artikel aktualisiert.'
         except IntegrityError:
@@ -136,15 +92,7 @@ class ItemService:
     
     @staticmethod
     def delete(item_id):
-        """
-        Löscht einen Artikel.
-        
-        Args:
-            item_id: ID des zu löschenden Artikels
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
+        """Löscht einen Artikel."""
         item = Item.query.get(item_id)
         if not item:
             return False, 'Artikel nicht gefunden.'
@@ -159,12 +107,7 @@ class ItemService:
     
     @staticmethod
     def get_low_stock():
-        """
-        Gibt alle Artikel mit niedrigem Bestand zurück.
-        
-        Returns:
-            list: Artikel unter Mindestbestand
-        """
+        """Gibt alle Artikel mit niedrigem Bestand zurück."""
         return Item.query.filter(Item.qty < Item.min_qty).all()
     
     @staticmethod

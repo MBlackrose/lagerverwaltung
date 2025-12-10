@@ -2,7 +2,6 @@
 from datetime import datetime
 from extensions import db
 
-
 class Item(db.Model):
     """
     Klasse für Artikel im Lager.
@@ -17,6 +16,10 @@ class Item(db.Model):
     name = db.Column(db.String(120), nullable=False)
     sku = db.Column(db.String(64), unique=True, nullable=True)
     barcode = db.Column(db.String(64), unique=True, nullable=True)
+    
+    # Inventar & Seriennummer (NEU)
+    inventory_number = db.Column(db.String(50))
+    serial_number = db.Column(db.String(50))
     
     # Bestand
     qty = db.Column(db.Integer, nullable=False, default=0)
