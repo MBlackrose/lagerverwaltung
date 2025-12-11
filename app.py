@@ -8,8 +8,7 @@ from extensions import db
 from models import Item, User, Movement
 
 # Services
-from services import CartService, ItemService, PDFService
-
+from services import CartService, ItemService, PDFService, EmailService
 
 # -------- KATEGORIEN MIT UNTERKATEGORIEN --------
 KATEGORIEN = {
@@ -294,18 +293,28 @@ def dashboard():
 @login_required
 def scanner():
     cart_service = CartService()
+    modus = request.args.get('modus') or session.get('scanner_modus', '')
     
     if request.method == 'POST':
         barcode = (request.form.get('barcode') or '').strip()
         quantity = int(request.form.get('quantity') or 1)
+        modus = request.form.get('modus', '')
+        
+        # Modus in Session speichern
+        session['scanner_modus'] = modus
         
         success, message = cart_service.add_item(barcode, quantity)
         flash(message, 'success' if success else 'error')
-        return redirect(url_for('scanner'))
+        return redirect(url_for('scanner', modus=modus))
+    
+    # Modus aus URL in Session speichern
+    if modus:
+        session['scanner_modus'] = modus
     
     return render_template('scanner.html', 
                           cart_items=cart_service.get_items(), 
-                          cart_count=cart_service.get_count())
+                          cart_count=cart_service.get_count(),
+                          modus=modus)
 
 
 @app.route('/cart/clear')
@@ -433,6 +442,18 @@ def movement_new():
                 pdf_path = PDFService.create_receipt(last_movement, last_item)
                 last_movement.pdf_file = pdf_path
                 db.session.commit()
+                
+                # E-Mail senden (Test-Modus)
+                if recipient_email:
+                    email_success, email_msg = EmailService.send_receipt(
+                        recipient_email=recipient_email,
+                        recipient_name=f"{recipient_firstname} {recipient_lastname}",
+                        pdf_path=pdf_path
+                    )
+                    if email_success:
+                        flash(f'E-Mail gesendet an {recipient_email}', 'success')
+                    else:
+                        flash(email_msg, 'warning')
         
         cart_service.clear()
         session['ausgabe_typ'] = ''

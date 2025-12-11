@@ -31,13 +31,14 @@ class CartService:
                 })
         return cart_items
     
-    def add_item(self, barcode, quantity=1):
+    def add_item(self, barcode, quantity=1, check_stock=True):
         """
         Fügt einen Artikel zum Warenkorb hinzu.
         
         Args:
             barcode: Barcode oder SKU des Artikels
             quantity: Menge (Standard: 1)
+            check_stock: Bestand prüfen? (False bei Rückgabe)
         
         Returns:
             tuple: (success: bool, message: str)
@@ -53,8 +54,8 @@ class CartService:
         if not item:
             return False, f'Artikel mit Barcode/SKU "{barcode}" nicht gefunden'
         
-        # Prüfen ob genug Bestand
-        if item.qty < quantity:
+        # Prüfen ob genug Bestand (nur bei Ausgabe, nicht bei Rückgabe)
+        if check_stock and item.qty < quantity:
             return False, f'Nicht genug Bestand! Verfügbar: {item.qty}'
         
         # Zum Warenkorb hinzufügen

@@ -1,0 +1,217 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Artikel bearbeiten - IT-Lagerverwaltung{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-12 h-12 bg-[#F18B00] flex items-center justify-center">
+        <span class="text-2xl">✏️</span>
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Artikel bearbeiten</h1>
+        <p class="text-gray-600 text-sm">{{ item.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hauptformular -->
+  <div class="bg-white border border-gray-300 shadow-md">
+    <form method="post" action="{{ url_for('items_edit', item_id=item.id) }}" class="p-8">
+      
+      <div class="space-y-6">
+        
+        <!-- Artikelname -->
+        <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+          <label class="block text-sm font-bold text-gray-900 mb-2">
+            Artikelname*
+          </label>
+          <input 
+            type="text"
+            name="name" 
+            value="{{ item.name }}"
+            required
+            class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+          >
+        </div>
+
+        <!-- Kategorie und Unterkategorie -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Kategorie -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Kategorie*
+            </label>
+            <select 
+              name="category" 
+              id="category"
+              required
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+              onchange="loadSubcategories()"
+            >
+              <option value="">-- Bitte wählen --</option>
+              {% for kat in kategorien.keys() %}
+              <option value="{{ kat }}" {% if item.category == kat %}selected{% endif %}>{{ kat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Unterkategorie -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Typ / Hersteller*
+            </label>
+            <select 
+              name="subcategory" 
+              id="subcategory"
+              required
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+              <option value="{{ item.subcategory }}" selected>{{ item.subcategory or '-- Bitte wählen --' }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- SKU und Barcode -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- SKU -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              SKU*
+            </label>
+            <input 
+              type="text"
+              name="sku" 
+              value="{{ item.sku }}"
+              required
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+
+          <!-- Barcode -->
+          <div class="bg-white p-6 border-l-4 border-gray-400">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Barcode (Optional)
+            </label>
+            <input 
+              type="text"
+              name="barcode"
+              value="{{ item.barcode or '' }}"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+        </div>
+
+        <!-- Inventarnummer und Seriennummer -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Inventarnummer -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Inventarnummer
+            </label>
+            <input 
+              type="text"
+              name="inventory_number"
+              value="{{ item.inventory_number or '' }}"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+
+          <!-- Seriennummer -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Seriennummer
+            </label>
+            <input 
+              type="text"
+              name="serial_number"
+              value="{{ item.serial_number or '' }}"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+        </div>
+
+        <!-- Bestand -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Aktueller Bestand -->
+          <div class="bg-white p-6 border-l-4 border-[#F18B00]">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Aktueller Bestand
+            </label>
+            <input 
+              type="number" 
+              name="qty" 
+              value="{{ item.qty }}" 
+              min="0"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+
+          <!-- Mindestbestand -->
+          <div class="bg-white p-6 border-l-4 border-gray-400">
+            <label class="block text-sm font-bold text-gray-900 mb-2">
+              Mindestbestand (Warnschwelle)
+            </label>
+            <input 
+              type="number" 
+              name="min_qty" 
+              value="{{ item.min_qty }}" 
+              min="0"
+              class="w-full px-4 py-3 bg-white border border-gray-400 text-gray-900 focus:border-[#98032D] focus:outline-none focus:ring-2 focus:ring-[#98032D]"
+            >
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-4 pt-4">
+          <button 
+            type="submit"
+            class="flex-1 bg-[#98032D] hover:opacity-90 text-white font-bold py-4 px-6 transition duration-200"
+          >
+            Änderungen speichern
+          </button>
+          
+          <a 
+            href="{{ url_for('items_list') }}"
+            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-4 px-6 transition duration-200 flex items-center justify-center"
+          >
+            Abbrechen
+          </a>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- JavaScript für Unterkategorien -->
+<script>
+function loadSubcategories() {
+  const category = document.getElementById('category').value;
+  const subcategorySelect = document.getElementById('subcategory');
+  
+  if (!category) {
+    subcategorySelect.innerHTML = '<option value="">-- Erst Kategorie wählen --</option>';
+    return;
+  }
+  
+  fetch('/api/subcategories/' + category)
+    .then(response => response.json())
+    .then(data => {
+      subcategorySelect.innerHTML = '<option value="">-- Bitte wählen --</option>';
+      data.forEach(sub => {
+        subcategorySelect.innerHTML += '<option value="' + sub + '">' + sub + '</option>';
+      });
+    });
+}
+</script>
+{% endblock %}

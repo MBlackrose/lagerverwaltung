@@ -1,7 +1,6 @@
+
 {% extends "layout.html" %}
-
 {% block title %}Barcode-Scanner - IT-Lagerverwaltung{% endblock %}
-
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 py-8">
     
@@ -11,13 +10,32 @@
         <p class="text-gray-600">Artikel scannen und zum Warenkorb hinzufügen</p>
     </div>
 
+    <!-- MODUS AUSWAHL -->
+    <div class="mb-6 bg-white border border-gray-300 shadow-md p-4">
+        <h3 class="font-bold text-gray-900 mb-3">Was möchten Sie tun?</h3>
+        <div class="flex gap-4">
+            <a href="{{ url_for('scanner', modus='ausgabe') }}" 
+               class="flex-1 py-4 px-6 text-center font-bold text-lg border-2 border-[#F18B00]
+               {% if modus == 'ausgabe' %}bg-[#F18B00] text-white{% else %}bg-white text-[#F18B00]{% endif %}">
+                AUSGABE (Ware geht raus)
+            </a>
+            <a href="{{ url_for('scanner', modus='rueckgabe') }}" 
+               class="flex-1 py-4 px-6 text-center font-bold text-lg border-2 border-green-600
+               {% if modus == 'rueckgabe' %}bg-green-600 text-white{% else %}bg-white text-green-600{% endif %}">
+                RÜCKGABE (Ware kommt zurück)
+            </a>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <!-- LINKE SEITE: Scanner -->
         <div class="bg-white border border-gray-300 shadow-md p-6">
             <h2 class="text-xl font-bold text-[#98032D] mb-4">Artikel scannen</h2>
             
+            {% if modus %}
             <form method="POST" action="{{ url_for('scanner') }}" class="space-y-4">
+                <input type="hidden" name="modus" value="{{ modus }}">
                 
                 <!-- Barcode Input -->
                 <div>
@@ -34,7 +52,7 @@
                         required
                     >
                 </div>
-
+                
                 <!-- Menge -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 text-gray-700">
@@ -49,24 +67,35 @@
                         required
                     >
                 </div>
-
+                
                 <!-- Button -->
                 <button 
                     type="submit"
-                    class="w-full bg-[#98032D] hover:opacity-90 text-white font-bold py-3 px-6"
+                    class="w-full {% if modus == 'ausgabe' %}bg-[#F18B00]{% else %}bg-green-600{% endif %} hover:opacity-90 text-white font-bold py-3 px-6"
                 >
                     Zum Warenkorb hinzufügen
                 </button>
-
             </form>
+            {% else %}
+            <div class="text-center py-8 text-gray-500">
+                <p class="mb-2">⬆️ Bitte wählen Sie zuerst oben:</p>
+                <p class="font-bold">AUSGABE oder RÜCKGABE</p>
+            </div>
+            {% endif %}
         </div>
-
+        
         <!-- RECHTE SEITE: Warenkorb -->
         <div class="bg-white border border-gray-300 shadow-md p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-[#98032D]">
                     Warenkorb ({{ cart_items|length }} Artikel)
                 </h2>
+                {% if modus %}
+                <span class="px-3 py-1 text-sm font-bold 
+                    {% if modus == 'ausgabe' %}bg-[#F18B00]{% else %}bg-green-600{% endif %} text-white">
+                    {{ 'AUSGABE' if modus == 'ausgabe' else 'RÜCKGABE' }}
+                </span>
+                {% endif %}
             </div>
             
             {% if cart_items %}
@@ -86,41 +115,36 @@
                     </div>
                     {% endfor %}
                 </div>
-
-                <!-- 3 OPTIONEN -->
+                
+                <!-- AKTIONEN -->
                 <div class="space-y-3">
-                    
-                    <!-- AUSGABE Button -->
+                    {% if modus == 'ausgabe' %}
                     <a href="{{ url_for('checkout', action='ausgabe') }}" 
                        class="block w-full bg-[#F18B00] hover:opacity-90 text-white font-bold py-3 px-6 text-center">
-                        AUSGABE (Ware geht raus)
+                        AUSGABE ABSCHLIESSEN →
                     </a>
-                    
-                    <!-- RÜCKGABE Button -->
+                    {% else %}
                     <a href="{{ url_for('checkout', action='rueckgabe') }}" 
                        class="block w-full bg-green-600 hover:opacity-90 text-white font-bold py-3 px-6 text-center">
-                        RÜCKGABE (Ware kommt zurück)
+                        RÜCKGABE ABSCHLIESSEN →
                     </a>
+                    {% endif %}
                     
-                    <!-- ABBRECHEN Button -->
                     <a href="{{ url_for('cart_clear') }}" 
                        class="block w-full bg-gray-500 hover:opacity-90 text-white font-bold py-3 px-6 text-center">
                         ABBRECHEN (Warenkorb leeren)
                     </a>
-                    
                 </div>
-
             {% else %}
                 <p class="text-gray-500 text-center py-8">Warenkorb ist leer</p>
                 <p class="text-sm text-gray-400 text-center">Scannen Sie Artikel um sie hinzuzufügen</p>
             {% endif %}
         </div>
-
     </div>
-
 </div>
 
 <script>
-document.getElementById('barcodeInput').focus();
+var input = document.getElementById('barcodeInput');
+if (input) input.focus();
 </script>
 {% endblock %}
